@@ -8,35 +8,35 @@ import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.testng.annotations.*;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Parameters;
 import utils.ConfigManager;
-import java.net.MalformedURLException;
+import utils.ExtentManager;
+
 import java.net.URL;
-import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
 
 public class TestBase {
     protected WebDriver driver;
+    protected WebDriverActions actions;
     protected static final String GRID_URL = ConfigManager.getProperty("grid.url");
     protected static final boolean USE_GRID = Boolean.parseBoolean(ConfigManager.getProperty("use.grid"));
-    protected static final String browser = ConfigManager.getProperty("browser");
     protected static final boolean isHeadless = Boolean.parseBoolean(ConfigManager.getProperty("isHeadless"));
     protected static final String env = ConfigManager.getProperty("env");
 
-
-    @BeforeSuite
-    public void beforeSuite() {
-        // Add any suite-level setup here
-        System.out.println("Environment is - "+env);
-        System.out.println("Browser is - "+browser);
-    }
-
     @BeforeMethod
-    public void setup() {
-        initializeDriver();
-        //configureDriver();
-        driver.get(ConfigManager.getProperty("base.url"));
+    @Parameters("browser")
+    public void setUp(String browser) {
+        try {
+            initializeDriver(browser);
+            actions = new WebDriverActions(driver);
+            ExtentManager.addSystemInfo("Browser", browser);
+            ExtentManager.addSystemInfo("Environment", env);
+            driver.get(ConfigManager.getProperty("base.url"));
+        } catch (Exception e) {
+            ExtentManager.addTestFail("Failed to initialize driver: " + e.getMessage());
+            throw e;
+        }
     }
 
     @AfterMethod
@@ -45,19 +45,14 @@ public class TestBase {
             try {
                 driver.quit();
             } catch (Exception e) {
-                System.err.println("Error closing driver: " + e.getMessage());
+                ExtentManager.addTestWarning("Error closing driver: " + e.getMessage());
             } finally {
                 driver = null;
             }
         }
     }
 
-    @AfterSuite
-    public void afterSuite() {
-        // Add any suite-level cleanup here
-    }
-
-    private void initializeDriver() {
+    private void initializeDriver(String browser) {
         if (USE_GRID) {
             initializeRemoteDriver(browser);
         } else {
@@ -66,7 +61,7 @@ public class TestBase {
     }
 
     private void initializeLocalDriver(String browser) {
-        switch (browser) {
+        switch (browser.toLowerCase()) {
             case "chrome":
                 driver = new ChromeDriver(getChromeOptions());
                 break;
@@ -76,7 +71,6 @@ public class TestBase {
             case "edge":
                 driver = new EdgeDriver(getEdgeOptions());
                 break;
-
             default:
                 throw new IllegalArgumentException("Unsupported browser: " + browser);
         }
@@ -84,23 +78,23 @@ public class TestBase {
 
     private void initializeRemoteDriver(String browser) {
         try {
-            Map<String, Object> capabilities = new HashMap<>();
-            capabilities.put("browserName", browser);
-//            capabilities.put("platform", ConfigManager.getProperty("platform"));
-//            capabilities.put("version", ConfigManager.getProperty("browser.version"));
-            
-            driver = new RemoteWebDriver(new URL(GRID_URL), new ChromeOptions().addArguments("--remote-allow-origins=*"));
-        } catch (MalformedURLException e) {
+            switch (browser.toLowerCase()) {
+                case "chrome":
+                    driver = new RemoteWebDriver(new URL(GRID_URL), getChromeOptions());
+                    break;
+                case "firefox":
+                    driver = new RemoteWebDriver(new URL(GRID_URL), getFirefoxOptions());
+                    break;
+                case "edge":
+                    driver = new RemoteWebDriver(new URL(GRID_URL), getEdgeOptions());
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unsupported browser: " + browser);
+            }
+        } catch (Exception e) {
             throw new RuntimeException("Failed to initialize remote driver: " + e.getMessage());
         }
     }
-
-//    private void configureDriver() {
-//        driver.manage().window().maximize();
-//        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(ConfigManager.getImplicitWait()));
-////        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(ConfigManager.getPageLoadTimeout()));
-////        driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(ConfigManager.getScriptTimeout()));
-//    }
 
     private ChromeOptions getChromeOptions() {
         ChromeOptions options = new ChromeOptions();

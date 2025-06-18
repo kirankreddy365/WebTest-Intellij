@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  selenium-hub:
+    image: selenium/hub:4.15.0
+    container_name: selenium-hub
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
+    environment:
+      - GRID_MAX_SESSION=16
+      - GRID_BROWSER_TIMEOUT=300
+      - GRID_TIMEOUT=300
+
+  chrome:
+    image: selenium/node-chrome:4.15.0
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=4
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+
+  firefox:
+    image: selenium/node-firefox:4.15.0
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=4
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+
+  edge:
+    image: selenium/node-edge:4.15.0
+    shm_size: 2gb
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+      - SE_NODE_MAX_SESSIONS=4
+      - SE_NODE_OVERRIDE_MAX_SESSIONS=true
+
+  test-app:
+    build:
+      context: ../../../..
+      dockerfile: src/test/resources/docker/Dockerfile
+    depends_on:
+      - selenium-hub
+      - chrome
+      - firefox
+      - edge
+    environment:
+      - USE_GRID=true
+      - GRID_URL=http://selenium-hub:4444/wd/hub
+      - BASE_URL=https://www.vaneck.com
+      - BROWSER=chrome
+      - IS_HEADLESS=true
+    volumes:
+      - ../../../test-output:/app/test-output
+    command: ["./mvnw", "clean", "test", "-Duse.grid=true", "-Dgrid.url=http://selenium-hub:4444/wd/hub", "-Dbrowser=chrome", "-DisHeadless=true"] 
