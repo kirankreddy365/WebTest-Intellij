@@ -2,6 +2,9 @@
 
 # Script to run tests in Docker with different configurations
 
+echo "Creating test-output directory..."
+mkdir -p test-output/screenshots test-output/extent-reports
+
 echo "Starting Selenium Grid..."
 docker-compose -f src/test/resources/docker/docker-compose.yml up -d selenium-hub chrome firefox edge
 

@@ -1,5 +1,10 @@
 # PowerShell script to run tests in Docker
 
+Write-Host "Creating test-output directory..." -ForegroundColor Green
+if (!(Test-Path "test-output")) { New-Item -ItemType Directory -Path "test-output" }
+if (!(Test-Path "test-output\screenshots")) { New-Item -ItemType Directory -Path "test-output\screenshots" }
+if (!(Test-Path "test-output\extent-reports")) { New-Item -ItemType Directory -Path "test-output\extent-reports" }
+
 Write-Host "Starting Selenium Grid..." -ForegroundColor Green
 docker-compose -f src\test\resources\docker\docker-compose.yml up -d selenium-hub chrome firefox edge
 

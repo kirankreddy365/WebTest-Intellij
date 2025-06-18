@@ -65,5 +65,5 @@ services:
       - BROWSER=chrome
       - IS_HEADLESS=true
     volumes:
-      - ../../../test-output:/app/test-output
+      - ./test-output:/app/test-output
     command: ["./mvnw", "clean", "test", "-Duse.grid=true", "-Dgrid.url=http://selenium-hub:4444/wd/hub", "-Dbrowser=chrome", "-DisHeadless=true"] 
