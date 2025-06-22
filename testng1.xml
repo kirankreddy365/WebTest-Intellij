@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Web Automation Suite" parallel="tests" thread-count="5">
+    <listeners>
+        <listener class-name="utils.TestListener"/>
+    </listeners>
+    <test name="Vaneck Tests-chrome">
+        <parameter name="browser" value="${browser}"></parameter>
+        <classes>
+            <class name="tests.VaneckTest"/>
+        </classes>
+    </test>
+</suite> 

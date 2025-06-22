@@ -19,6 +19,7 @@
         <browser>chrome</browser>
         <parallel>false</parallel>
         <thread.count>1</thread.count>
+        <suiteXmlFile>testng.xml</suiteXmlFile>
     </properties>
 
     <profiles>
@@ -45,7 +46,7 @@
                 <isHeadless>false</isHeadless>
                 <base.url>https://www.vaneck.com/us/en/</base.url>
                 <use.grid>false</use.grid>
-                <grid.url>http://selenium-grid:4444</grid.url>
+                <grid.url>http://localhost:4444</grid.url>
                 <debug.mode>false</debug.mode>
             </properties>
         </profile>
@@ -72,7 +73,6 @@
             <artifactId>webdrivermanager</artifactId>
             <version>${webdrivermanager.version}</version>
         </dependency>
-
         <!-- ExtentReports -->
         <dependency>
             <groupId>com.aventstack</groupId>
@@ -98,7 +98,7 @@
                 <version>3.2.2</version>
                 <configuration>
                     <suiteXmlFiles>
-                        <suiteXmlFile>testng.xml</suiteXmlFile>
+                        <suiteXmlFile>${suiteXmlFile}</suiteXmlFile>
                     </suiteXmlFiles>
                     <systemPropertyVariables>
                         <env>${env}</env>

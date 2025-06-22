@@ -1,3 +1,0 @@
-@echo off
-echo Running Docker tests from project root...
-call run-tests-docker.bat 

@@ -1,8 +1,0 @@
-target/
-test-output/
-.git/
-.idea/
-.vscode/
-*.log
-*.md
-.gitignore 

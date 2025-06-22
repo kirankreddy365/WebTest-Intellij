@@ -4,8 +4,17 @@ import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LogEntry;
 import base.TestBase;
 import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class TestListener implements ITestListener {
     private static final int MAX_RETRY_COUNT = 3;
@@ -15,6 +24,8 @@ public class TestListener implements ITestListener {
         ExtentManager.initializeReport();
         ExtentManager.addSystemInfo("Test Suite", context.getName());
         ExtentManager.addSystemInfo("Start Time", new java.util.Date().toString());
+        ExtentManager.addSystemInfo("Docker Environment", "Selenium Grid with VNC enabled");
+        ExtentManager.addSystemInfo("VNC Ports", "Chrome: 5900, Firefox: 5901, Edge: 5902");
     }
 
     @Override
@@ -28,6 +39,9 @@ public class TestListener implements ITestListener {
         if (result.getParameters().length > 0) {
             ExtentManager.addTestInfo("Test Parameters: " + Arrays.toString(result.getParameters()));
         }
+        
+        // Log browser information
+        logBrowserInfo(result);
     }
 
     @Override
@@ -39,6 +53,9 @@ public class TestListener implements ITestListener {
         if (result.getMethod().getDescription() != null) {
             ExtentManager.addTestInfo("Description: " + result.getMethod().getDescription());
         }
+        
+        // Capture final page state for successful tests
+        capturePageState(result, "SUCCESS");
     }
 
     @Override
@@ -66,6 +83,9 @@ public class TestListener implements ITestListener {
                 ExtentManager.getTest().addScreenCaptureFromPath(screenshotPath);
                 ExtentManager.addTestInfo("Screenshot captured: " + screenshotPath);
             }
+            
+            // Capture detailed page state for failed tests
+            capturePageState(result, "FAILURE");
         } else {
             ExtentManager.addTestInfo("Retrying test: " + result.getName() + 
                 " (Attempt " + (retryCount + 1) + " of " + MAX_RETRY_COUNT + ")");
@@ -104,6 +124,98 @@ public class TestListener implements ITestListener {
             }
         } catch (Exception e) {
             ExtentManager.addTestWarning("Failed to capture screenshot: " + e.getMessage());
+        }
+        return null;
+    }
+    
+    private void logBrowserInfo(ITestResult result) {
+        try {
+            Object testClass = result.getInstance();
+            if (testClass instanceof TestBase) {
+                WebDriver driver = ((TestBase) testClass).getDriver();
+                if (driver != null) {
+                    ExtentManager.addTestInfo("Browser: " + driver.getClass().getSimpleName());
+                    ExtentManager.addTestInfo("Current URL: " + driver.getCurrentUrl());
+                    ExtentManager.addTestInfo("Page Title: " + driver.getTitle());
+                }
+            }
+        } catch (Exception e) {
+            ExtentManager.addTestWarning("Failed to log browser info: " + e.getMessage());
+        }
+    }
+    
+    private void capturePageState(ITestResult result, String state) {
+        try {
+            Object testClass = result.getInstance();
+            if (testClass instanceof TestBase) {
+                WebDriver driver = ((TestBase) testClass).getDriver();
+                if (driver != null) {
+                    // Capture page source
+                    String pageSource = driver.getPageSource();
+                    String pageSourcePath = savePageSource(pageSource, result.getName(), state);
+                    if (pageSourcePath != null) {
+                        ExtentManager.addTestInfo("Page source saved: " + pageSourcePath);
+                    }
+                    
+                    // Capture browser console logs
+                    String consoleLogsPath = captureConsoleLogs(driver, result.getName(), state);
+                    if (consoleLogsPath != null) {
+                        ExtentManager.addTestInfo("Console logs saved: " + consoleLogsPath);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            ExtentManager.addTestWarning("Failed to capture page state: " + e.getMessage());
+        }
+    }
+    
+    private String savePageSource(String pageSource, String testName, String state) {
+        try {
+            String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String fileName = testName + "_" + state + "_" + timestamp + ".html";
+            String filePath = ConfigManager.getProperty("screenshot.path") + "pagesource/" + fileName;
+            
+            // Create directory if it doesn't exist
+            File directory = new File(ConfigManager.getProperty("screenshot.path") + "pagesource/");
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
+            
+            FileWriter writer = new FileWriter(filePath);
+            writer.write(pageSource);
+            writer.close();
+            
+            return filePath;
+        } catch (IOException e) {
+            ExtentManager.addTestWarning("Failed to save page source: " + e.getMessage());
+            return null;
+        }
+    }
+    
+    private String captureConsoleLogs(WebDriver driver, String testName, String state) {
+        try {
+            List<LogEntry> logs = driver.manage().logs().get(LogType.BROWSER).getAll();
+            if (!logs.isEmpty()) {
+                String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                String fileName = testName + "_" + state + "_" + timestamp + "_console.log";
+                String filePath = ConfigManager.getProperty("screenshot.path") + "logs/" + fileName;
+                
+                // Create directory if it doesn't exist
+                File directory = new File(ConfigManager.getProperty("screenshot.path") + "logs/");
+                if (!directory.exists()) {
+                    directory.mkdirs();
+                }
+                
+                FileWriter writer = new FileWriter(filePath);
+                for (LogEntry log : logs) {
+                    writer.write(log.getTimestamp() + " " + log.getLevel() + " " + log.getMessage() + "\n");
+                }
+                writer.close();
+                
+                return filePath;
+            }
+        } catch (Exception e) {
+            ExtentManager.addTestWarning("Failed to capture console logs: " + e.getMessage());
         }
         return null;
     }

@@ -1,6 +1,8 @@
 package tests;
 
 import base.TestBase;
+
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import pages.VaneckPage;
 import utils.RetryAnalyzer;
@@ -13,6 +15,6 @@ public class VaneckTest extends TestBase {
         vaneckPage = new VaneckPage(driver);
         vaneckPage.navigateToFundExplorer();
         vaneckPage.selectInvestmentType("Mutual Funds");
-        vaneckPage.isMutualFundsSelected("Mutual Funds");
+        Assert.assertTrue(vaneckPage.isMutualFundsSelected("Mutual Funds"), "Mutual Funds option is not selected");
     }
 } 
