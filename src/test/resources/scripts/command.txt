@@ -1,0 +1,2 @@
+chmod +x src/test/resources/scripts/run-tests.sh
+.src/test/resources/scripts/run-tests.sh

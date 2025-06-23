@@ -21,8 +21,10 @@ public class ExtentManager {
     public static void initializeReport() {
         if (!isInitialized) {
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String reportPath = "test-output/ExtentReport_" + timestamp + ".html";
-            
+            //String reportPath = "test-output/ExtentReport_" + timestamp + ".html";
+            String reportPath = "test-output/ExtentReport.html";
+
+
             ExtentSparkReporter sparkReporter = new ExtentSparkReporter(reportPath);
             sparkReporter.config().setTheme(Theme.DARK);
             sparkReporter.config().setDocumentTitle("Vaneck Automation Report");
