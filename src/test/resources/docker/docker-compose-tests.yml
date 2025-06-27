@@ -7,6 +7,6 @@ services:
       - selenium-hub
       - chrome
     volumes:
-      - ./:/usr/src/app
+      - .:/usr/src/app
     working_dir: /usr/src/app
-    command: mvn clean test -P grid
+    command: mvn clean test -Pgrid-remote
