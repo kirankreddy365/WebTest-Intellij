@@ -10,6 +10,9 @@ services:
   chrome:
     image: selenium/node-chrome:4.20.0
     shm_size: 2g
+    container_name: chrome
+    ports:
+      - "5900:5900"  # VNC port for viewing browser execution
     depends_on:
       - selenium-hub
     environment:
@@ -17,13 +20,13 @@ services:
       - SE_EVENT_BUS_PUBLISH_PORT=4442
       - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
 
-  test-runner:
-    image: maven:3.9.6-eclipse-temurin-17
-    container_name: test-runner
-    depends_on:
-      - selenium-hub
-      - chrome
-    volumes:
-      - ./:/usr/src/app
-    working_dir: /usr/src/app
-    command: mvn clean test -Pgrid-remote
+#  test-runner:
+#    image: maven:3.9.6-eclipse-temurin-17
+#    container_name: test-runner
+#    depends_on:
+#      - selenium-hub
+#      - chrome
+#    volumes:
+#      - ./:/usr/src/app
+#    working_dir: /usr/src/app
+#    command: mvn clean test -Pgrid-remote

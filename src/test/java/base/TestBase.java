@@ -81,12 +81,15 @@ public class TestBase {
             switch (browser.toLowerCase()) {
                 case "chrome":
                     driver = new RemoteWebDriver(new URL(GRID_URL), getChromeOptions());
+                    System.out.println("Chrome browser is lunched.");
                     break;
                 case "firefox":
                     driver = new RemoteWebDriver(new URL(GRID_URL), getFirefoxOptions());
+                    System.out.println("Firefox browser is lunched.");
                     break;
                 case "edge":
                     driver = new RemoteWebDriver(new URL(GRID_URL), getEdgeOptions());
+                    System.out.println("Edge browser is lunched.");
                     break;
                 default:
                     throw new IllegalArgumentException("Unsupported browser: " + browser);

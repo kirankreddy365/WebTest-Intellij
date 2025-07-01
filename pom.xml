@@ -78,6 +78,19 @@
             </properties>
         </profile>
 
+        <profile>
+            <id>remote-chrome</id>
+            <properties>
+                <env>staging</env>
+                <browser>chrome</browser>
+                <isHeadless>false</isHeadless>
+                <base.url>https://www.vaneck.com/us/en/</base.url>
+                <use.grid>true</use.grid>
+                <grid.url>http://chrome:4444/wd/hub</grid.url>
+                <debug.mode>false</debug.mode>
+            </properties>
+        </profile>
+
     </profiles>
 
     <dependencies>

@@ -9,6 +9,9 @@ services:
 
   chrome:
     image: selenium/node-chrome:4.20.0
+    container_name: chrome-node
+    ports:
+      - "5900:5900"  # VNC port for viewing browser execution
     shm_size: 2g
     depends_on:
       - selenium-hub
