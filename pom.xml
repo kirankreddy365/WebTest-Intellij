@@ -17,10 +17,10 @@
         <webdrivermanager.version>5.6.2</webdrivermanager.version>
         <extentreports.version>5.1.1</extentreports.version>
         <jsch.version>2.27.2</jsch.version>
-        <browser>chrome</browser>
         <parallel>false</parallel>
         <thread.count>1</thread.count>
         <suiteXmlFile>testng.xml</suiteXmlFile>
+
     </properties>
 
     <profiles>
@@ -55,12 +55,13 @@
         <profile>
             <id>grid-local</id>
             <properties>
-                <env>staging</env>
+                <env>grid-local</env>
                 <browser>chrome</browser>
-                <isHeadless>true</isHeadless>
+                <isHeadless>false</isHeadless>
                 <base.url>https://www.vaneck.com/us/en/</base.url>
                 <use.grid>true</use.grid>
-                <grid.url>http://localhost:4444/</grid.url>
+<!--                <grid.url>http://localhost:4444/</grid.url>-->
+                <grid.url>http://selenium-hub:4444/wd/hub</grid.url>
                 <debug.mode>false</debug.mode>
             </properties>
         </profile>
@@ -68,25 +69,12 @@
         <profile>
             <id>grid-remote</id>
             <properties>
-                <env>staging</env>
+                <env>grid-remote</env>
                 <browser>chrome</browser>
                 <isHeadless>true</isHeadless>
                 <base.url>https://www.vaneck.com/us/en/</base.url>
                 <use.grid>true</use.grid>
                 <grid.url>http://selenium-hub:4444/wd/hub</grid.url>
-                <debug.mode>false</debug.mode>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>remote-chrome</id>
-            <properties>
-                <env>staging</env>
-                <browser>chrome</browser>
-                <isHeadless>false</isHeadless>
-                <base.url>https://www.vaneck.com/us/en/</base.url>
-                <use.grid>true</use.grid>
-                <grid.url>http://chrome:4444/wd/hub</grid.url>
                 <debug.mode>false</debug.mode>
             </properties>
         </profile>

@@ -13,10 +13,11 @@ public class VaneckTest extends TestBase {
 
     @Test(retryAnalyzer = RetryAnalyzer.class)
     public void testVaneckWebsite() {
+        //driver.navigate().to(ConfigManager.getProperty("base.url"));
         vaneckPage = new VaneckPage(driver);
         vaneckPage.navigateToFundExplorer();
         vaneckPage.selectInvestmentType("Mutual Funds");
         Assert.assertTrue(vaneckPage.isMutualFundsSelected("Mutual Funds"), "Mutual Funds option is not selected");
-        System.out.println("Test passed in environment: "+ ConfigManager.getProperty("env"));
+        System.out.println("Test passed in environment: "+ System.getProperty("env"));
     }
 } 

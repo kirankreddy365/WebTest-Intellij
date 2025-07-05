@@ -20,24 +20,12 @@ public class ConfigManager {
     }
 
     public static String getProperty(String key) {
-        String systemValue = System.getProperty(key);
-        if (systemValue != null) {
-            return systemValue;
-        }
+//        String systemValue = System.getProperty(key);
+//        if (systemValue != null) {
+//            return systemValue;
+//        }
         return properties.getProperty(key);
     }
-
-//    public static String getBaseUrl() {
-//        return getProperty("base.url");
-//    }
-//
-//    public static String getBrowser() {
-//        return getProperty("browser");
-//    }
-//
-//    public static boolean isHeadless() {
-//        return Boolean.parseBoolean(getProperty("isHeadless"));
-//    }
 
     public static int getImplicitWait() {
         return Integer.parseInt(getProperty("implicit.wait"));
@@ -45,10 +33,6 @@ public class ConfigManager {
 
     public static int getExplicitWait() {
         return Integer.parseInt(getProperty("explicit.wait"));
-    }
-
-    public static String getEnvironment() {
-        return getProperty("env");
     }
 
     public static String getTestDataPath() {

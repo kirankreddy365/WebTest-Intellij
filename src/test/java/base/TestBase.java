@@ -19,16 +19,23 @@ import java.net.URL;
 public class TestBase {
     protected WebDriver driver;
     protected WebDriverActions actions;
-    protected static final String GRID_URL = ConfigManager.getProperty("grid.url");
-    protected static final boolean USE_GRID = Boolean.parseBoolean(ConfigManager.getProperty("use.grid"));
-    protected static final boolean isHeadless = Boolean.parseBoolean(ConfigManager.getProperty("isHeadless"));
-    protected static final String env = ConfigManager.getProperty("env");
+    protected static final String GRID_URL = System.getProperty("grid.url");
+    protected static final boolean USE_GRID = Boolean.parseBoolean(System.getProperty("use.grid"));
+    protected static final boolean isHeadless = Boolean.parseBoolean(System.getProperty("isHeadless"));
+    protected static final String env = System.getProperty("env");
+    protected static final String browser = System.getProperty("browser");
+
+//    protected static final String GRID_URL = "http://localhost:4444/";
+//    protected static final boolean USE_GRID = true;//Boolean.parseBoolean(System.getProperty("use.grid"));
+//    protected static final boolean isHeadless = true;//Boolean.parseBoolean(System.getProperty("isHeadless"));
+//    protected static final String browser = "chrome";
 
     @BeforeMethod
-    @Parameters("browser")
-    public void setUp(String browser) {
+    //@Parameters("browser")
+    public void setUp() {
         try {
             initializeDriver(browser);
+            //System.out.println("Browser: "+browser);
             actions = new WebDriverActions(driver);
             ExtentManager.addSystemInfo("Browser", browser);
             ExtentManager.addSystemInfo("Environment", env);
@@ -45,6 +52,7 @@ public class TestBase {
             try {
                 driver.quit();
             } catch (Exception e) {
+                e.printStackTrace();
                 ExtentManager.addTestWarning("Error closing driver: " + e.getMessage());
             } finally {
                 driver = null;
@@ -53,6 +61,7 @@ public class TestBase {
     }
 
     private void initializeDriver(String browser) {
+        ExtentManager.addTestInfo("Browser: "+browser);
         if (USE_GRID) {
             initializeRemoteDriver(browser);
         } else {
@@ -64,6 +73,7 @@ public class TestBase {
         switch (browser.toLowerCase()) {
             case "chrome":
                 driver = new ChromeDriver(getChromeOptions());
+                System.out.println("Chrome browser is lunched.");
                 break;
             case "firefox":
                 driver = new FirefoxDriver(getFirefoxOptions());
@@ -81,7 +91,7 @@ public class TestBase {
             switch (browser.toLowerCase()) {
                 case "chrome":
                     driver = new RemoteWebDriver(new URL(GRID_URL), getChromeOptions());
-                    System.out.println("Chrome browser is lunched.");
+                    System.out.println("Remote Chrome browser is lunched.");
                     break;
                 case "firefox":
                     driver = new RemoteWebDriver(new URL(GRID_URL), getFirefoxOptions());
@@ -95,6 +105,7 @@ public class TestBase {
                     throw new IllegalArgumentException("Unsupported browser: " + browser);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException("Failed to initialize remote driver: " + e.getMessage());
         }
     }
